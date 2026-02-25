@@ -2040,53 +2040,20 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
         f = Frame(self())
         f.pack(side=BOTTOM, fill=X)
 
-        self.override = IntVar()
-        self.override.set(100)
         self.spindle = BooleanVar()
         self.spindleSpeed = IntVar()
-
-        col, row = 0, 0
-        self.overrideCombo = tkExtra.Combobox(
-            f, width=8, command=self.overrideComboChange
-        )
-        self.overrideCombo.fill(OVERRIDES)
-        self.overrideCombo.grid(row=row, column=col, pady=0, sticky=EW)
-        tkExtra.Balloon.set(self.overrideCombo, _("Select override type."))
-
-        b = Button(f, text=_("Reset"), pady=0, command=self.resetOverride)
-        b.grid(row=row + 1, column=col, pady=0, sticky=NSEW)
-        tkExtra.Balloon.set(b, _("Reset override to 100%"))
-
-        col += 1
-        self.overrideScale = Scale(
-            f,
-            command=self.overrideChange,
-            variable=self.override,
-            showvalue=True,
-            orient=HORIZONTAL,
-            from_=25,
-            to_=200,
-            resolution=1,
-        )
-        self.overrideScale.bind("<Double-1>", self.resetOverride)
-        self.overrideScale.bind("<Button-3>", self.resetOverride)
-        self.overrideScale.grid(
-            row=row, column=col, rowspan=2, columnspan=4, sticky=EW)
-        tkExtra.Balloon.set(
-            self.overrideScale,
-            _("Set Feed/Rapid/Spindle Override. "
-              + "Right or Double click to reset."),
-        )
-
-        self.overrideCombo.set(OVERRIDES[0])
+        # keep coolant state variables but no UI (coolant controls removed)
+        self.coolant = BooleanVar()
+        self.mist = BooleanVar()
+        self.flood = BooleanVar()
 
         # ---
         row += 2
         col = 0
         b = Checkbutton(
             f,
-            text=_("Spindle"),
-            image=Utils.icons["spinningtop"],
+            text=_("Hot Wire"),
+            image=Utils.icons["pyrograph"],
             command=self.spindleControl,
             compound=LEFT,
             indicatoron=False,
@@ -2094,7 +2061,7 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             padx=1,
             pady=0,
         )
-        tkExtra.Balloon.set(b, _("Start/Stop spindle (M3/M5)"))
+        tkExtra.Balloon.set(b, _("Start/Stop hot wire (M3/M5)"))
         b.grid(row=row, column=col, pady=0, sticky=NSEW)
         self.addWidget(b)
 
@@ -2105,88 +2072,25 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             command=self.spindleControl,
             showvalue=True,
             orient=HORIZONTAL,
-            from_=Utils.config.get("CNC", "spindlemin"),
-            to_=Utils.config.get("CNC", "spindlemax"),
+            from_=0,
+            to_=100,
         )
-        tkExtra.Balloon.set(b, _("Set spindle RPM"))
+        tkExtra.Balloon.set(b, _("Set Hot Wire PWM (0-100%)"))
         b.grid(row=row, column=col, sticky=EW, columnspan=3)
         self.addWidget(b)
-
-        f.grid_columnconfigure(1, weight=1)
-
-        # Coolant control
-
-        self.coolant = BooleanVar()
-        self.mist = BooleanVar()
-        self.flood = BooleanVar()
-
-        row += 1
-        col = 0
-        Label(f, text=_("Coolant:")).grid(row=row, column=col, sticky=E)
-        col += 1
-
-        coolantDisable = Checkbutton(
-            f,
-            text=_("OFF"),
-            command=self.coolantOff,
-            indicatoron=False,
-            variable=self.coolant,
-            padx=1,
-            pady=0,
-        )
-        tkExtra.Balloon.set(coolantDisable, _("Stop cooling (M9)"))
-        coolantDisable.grid(row=row, column=col, pady=0, sticky=NSEW)
-        self.addWidget(coolantDisable)
-
-        col += 1
-        floodEnable = Checkbutton(
-            f,
-            text=_("Flood"),
-            command=self.coolantFlood,
-            indicatoron=False,
-            variable=self.flood,
-            padx=1,
-            pady=0,
-        )
-        tkExtra.Balloon.set(floodEnable, _("Start flood (M8)"))
-        floodEnable.grid(row=row, column=col, pady=0, sticky=NSEW)
-        self.addWidget(floodEnable)
-
-        col += 1
-        mistEnable = Checkbutton(
-            f,
-            text=_("Mist"),
-            command=self.coolantMist,
-            indicatoron=False,
-            variable=self.mist,
-            padx=1,
-            pady=0,
-        )
-        tkExtra.Balloon.set(mistEnable, _("Start mist (M7)"))
-        mistEnable.grid(row=row, column=col, pady=0, sticky=NSEW)
-        self.addWidget(mistEnable)
         f.grid_columnconfigure(1, weight=1)
 
     # ----------------------------------------------------------------------
     def overrideChange(self, event=None):
-        n = self.overrideCombo.get()
-        c = self.override.get()
-        CNC.vars["_Ov" + n] = c
-        CNC.vars["_OvChanged"] = True
+        pass
 
     # ----------------------------------------------------------------------
     def resetOverride(self, event=None):
-        self.override.set(100)
-        self.overrideChange()
+        pass
 
     # ----------------------------------------------------------------------
     def overrideComboChange(self):
-        n = self.overrideCombo.get()
-        if n == "Rapid":
-            self.overrideScale.config(to_=100, resolution=25)
-        else:
-            self.overrideScale.config(to_=200, resolution=1)
-        self.override.set(CNC.vars["_Ov" + n])
+        pass
 
     # ----------------------------------------------------------------------
     def _gChange(self, value, dictionary):
@@ -2303,7 +2207,22 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             self.feedRate.set(str(CNC.vars["feed"]))
             self.feedMode.set(FEED_MODE[CNC.vars["feedmode"]])
             self.spindle.set(CNC.vars["spindle"] == "M3")
-            self.spindleSpeed.set(int(CNC.vars["rpm"]))
+            # Map rpm to 0..100 PWM percentage for display
+            rpm = int(CNC.vars.get("rpm", 0))
+            try:
+                minv = Utils.config.getint("CNC", "spindlemin")
+                maxv = Utils.config.getint("CNC", "spindlemax")
+            except Exception:
+                minv, maxv = 0, 100
+            if maxv != minv:
+                pct = int(round((rpm - minv) / (maxv - minv) * 100))
+            else:
+                pct = 0
+            if pct < 0:
+                pct = 0
+            if pct > 100:
+                pct = 100
+            self.spindleSpeed.set(pct)
             self.toolEntry.set(CNC.vars["tool"])
             self.units.set(UNITS[CNC.vars["units"]])
             self.distance.set(DISTANCE_MODE[CNC.vars["distance"]])
