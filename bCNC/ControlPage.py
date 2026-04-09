@@ -2122,7 +2122,7 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             showvalue=True,
             orient=HORIZONTAL,
             from_=0,
-            to_=100,
+            to_=1200,
         )
         tkExtra.Balloon.set(b, _("Set Hot Wire PWM (0-100%)"))
         b.grid(row=row, column=col, sticky=EW, columnspan=3)
