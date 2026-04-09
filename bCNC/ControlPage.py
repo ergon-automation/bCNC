@@ -924,8 +924,8 @@ class ControlFrame(CNCRibbon.PageExLabelFrame):
         row += 1
         col = 0
 
-        width = 3
-        height = 2
+        width = 8
+        height = 5
 
         b = Button(
             frame,
@@ -2040,6 +2040,7 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
         f = Frame(self())
         f.pack(side=BOTTOM, fill=X)
 
+        self.override = IntVar(value=100)
         self.spindle = BooleanVar()
         self.spindleSpeed = IntVar()
         # keep coolant state variables but no UI (coolant controls removed)
@@ -2047,7 +2048,55 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
         self.mist = BooleanVar()
         self.flood = BooleanVar()
 
-        # ---
+        # Override
+        row, col = 0, 0
+        self.overrideCombo = tkExtra.Combobox(
+            f,
+            width=8,
+            command=self.overrideComboChange,
+            background=tkExtra.GLOBAL_CONTROL_BACKGROUND,
+        )
+        self.overrideCombo.fill(OVERRIDES)
+        self.overrideCombo.grid(row=row, column=col, pady=0, sticky=EW)
+        tkExtra.Balloon.set(self.overrideCombo, _("Select override type."))
+        self.addWidget(self.overrideCombo)
+
+        b = Button(f, text=_("Reset"), pady=0, command=self.resetOverride)
+        b.grid(row=row + 1, column=col, pady=0, sticky=NSEW)
+        tkExtra.Balloon.set(b, _("Reset override to 100%"))
+        self.addWidget(b)
+
+        col += 1
+        self.overrideScale = Scale(
+            f,
+            command=self.overrideChange,
+            variable=self.override,
+            showvalue=True,
+            orient=HORIZONTAL,
+            from_=25,
+            to_=200,
+            resolution=1,
+        )
+        self.overrideScale.bind("<Double-1>", self.resetOverride)
+        self.overrideScale.bind("<Button-3>", self.resetOverride)
+        self.overrideScale.grid(
+            row=row,
+            column=col,
+            rowspan=2,
+            columnspan=4,
+            sticky=EW,
+        )
+        tkExtra.Balloon.set(
+            self.overrideScale,
+            _(
+                "Set Feed/Rapid/Spindle Override. Right or Double click to reset."
+            ),
+        )
+        self.addWidget(self.overrideScale)
+        self.overrideCombo.set(OVERRIDES[0])
+        self.overrideComboChange()
+
+        # Hot wire
         row += 2
         col = 0
         b = Checkbutton(
@@ -2082,15 +2131,25 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
 
     # ----------------------------------------------------------------------
     def overrideChange(self, event=None):
-        pass
+        name = self.overrideCombo.get()
+        if not name:
+            return
+        CNC.vars[f"_Ov{name}"] = self.override.get()
+        CNC.vars["_OvChanged"] = True
 
     # ----------------------------------------------------------------------
     def resetOverride(self, event=None):
-        pass
+        self.override.set(100)
+        self.overrideChange()
 
     # ----------------------------------------------------------------------
     def overrideComboChange(self):
-        pass
+        name = self.overrideCombo.get()
+        if name == "Rapid":
+            self.overrideScale.config(to_=100, resolution=25)
+        else:
+            self.overrideScale.config(to_=200, resolution=1)
+        self.override.set(CNC.vars.get(f"_Ov{name}", 100))
 
     # ----------------------------------------------------------------------
     def _gChange(self, value, dictionary):
