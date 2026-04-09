@@ -2076,6 +2076,8 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             from_=25,
             to_=200,
             resolution=1,
+            width=28,
+            sliderlength=40,
         )
         self.overrideScale.bind("<Double-1>", self.resetOverride)
         self.overrideScale.bind("<Button-3>", self.resetOverride)
@@ -2123,6 +2125,8 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             orient=HORIZONTAL,
             from_=0,
             to_=1200,
+            width=28,
+            sliderlength=40,
         )
         tkExtra.Balloon.set(b, _("Set Hot Wire PWM (0-100%)"))
         b.grid(row=row, column=col, sticky=EW, columnspan=3)
