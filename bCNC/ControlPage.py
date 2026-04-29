@@ -347,8 +347,10 @@ class DROFrame(CNCRibbon.PageFrame):
             text=_("X=0"),
             command=self.setX0,
             activebackground="LightYellow",
-            padx=2,
-            pady=1,
+            padx=8,
+            pady=6,
+            width=6,
+            height=2,
         )
         self.xzero.grid(row=row, column=col, pady=0, sticky=EW)
         tkExtra.Balloon.set(
@@ -363,8 +365,10 @@ class DROFrame(CNCRibbon.PageFrame):
             text=_("Y=0"),
             command=self.setY0,
             activebackground="LightYellow",
-            padx=2,
-            pady=1,
+            padx=8,
+            pady=6,
+            width=6,
+            height=2,
         )
         self.yzero.grid(row=row, column=col, pady=0, sticky=EW)
         tkExtra.Balloon.set(
@@ -379,8 +383,10 @@ class DROFrame(CNCRibbon.PageFrame):
             text=_("Z=0"),
             command=self.setZ0,
             activebackground="LightYellow",
-            padx=2,
-            pady=1,
+            padx=8,
+            pady=6,
+            width=6,
+            height=2,
         )
         self.zzero.grid(row=row, column=col, pady=0, sticky=EW)
         tkExtra.Balloon.set(
@@ -397,8 +403,10 @@ class DROFrame(CNCRibbon.PageFrame):
             text=_("XY=0"),
             command=self.setXY0,
             activebackground="LightYellow",
-            padx=2,
-            pady=1,
+            padx=8,
+            pady=6,
+            width=6,
+            height=2,
         )
         self.xyzero.grid(row=row, column=col, pady=0, sticky=EW)
         tkExtra.Balloon.set(
@@ -413,8 +421,10 @@ class DROFrame(CNCRibbon.PageFrame):
             text=_("XYZ=0"),
             command=self.setXYZ0,
             activebackground="LightYellow",
-            padx=2,
-            pady=1,
+            padx=8,
+            pady=6,
+            width=6,
+            height=2,
         )
         self.xyzzero.grid(row=row, column=col, pady=0, sticky=EW, columnspan=2)
         tkExtra.Balloon.set(
@@ -423,39 +433,39 @@ class DROFrame(CNCRibbon.PageFrame):
         )
         self.addWidget(self.xyzzero)
 
-        # Set buttons
-        row += 1
-        col = 1
-        f = Frame(self)
-        f.grid(row=row, column=col, columnspan=3, pady=0, sticky=EW)
+        # # Set buttons
+        # row += 1
+        # col = 1
+        # f = Frame(self)
+        # f.grid(row=row, column=col, columnspan=3, pady=0, sticky=EW)
 
-        b = Button(
-            f,
-            text=_("Set WPOS"),
-            image=Utils.icons["origin"],
-            compound=LEFT,
-            activebackground="LightYellow",
-            command=lambda s=self: s.event_generate("<<SetWPOS>>"),
-            padx=2,
-            pady=1,
-        )
-        b.pack(side=LEFT, fill=X, expand=YES)
-        tkExtra.Balloon.set(b, _("Set WPOS to mouse location"))
-        self.addWidget(b)
+        # b = Button(
+            # f,
+            # text=_("Set WPOS"),
+            # image=Utils.icons["origin"],
+            # compound=LEFT,
+            # activebackground="LightYellow",
+            # command=lambda s=self: s.event_generate("<<SetWPOS>>"),
+            # padx=2,
+            # pady=1,
+        # )
+        # b.pack(side=LEFT, fill=X, expand=YES)
+        # tkExtra.Balloon.set(b, _("Set WPOS to mouse location"))
+        # self.addWidget(b)
 
-        b = Button(
-            f,
-            text=_("Move Gantry"),
-            image=Utils.icons["gantry"],
-            compound=LEFT,
-            activebackground="LightYellow",
-            command=lambda s=self: s.event_generate("<<MoveGantry>>"),
-            padx=2,
-            pady=1,
-        )
-        b.pack(side=RIGHT, fill=X, expand=YES)
-        tkExtra.Balloon.set(b, _("Move gantry to mouse location [g]"))
-        self.addWidget(b)
+        # b = Button(
+            # f,
+            # text=_("Move Gantry"),
+            # image=Utils.icons["gantry"],
+            # compound=LEFT,
+            # activebackground="LightYellow",
+            # command=lambda s=self: s.event_generate("<<MoveGantry>>"),
+            # padx=2,
+            # pady=1,
+        # )
+        # b.pack(side=RIGHT, fill=X, expand=YES)
+        # tkExtra.Balloon.set(b, _("Move gantry to mouse location [g]"))
+        # self.addWidget(b)
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure(2, weight=1)
@@ -2061,7 +2071,15 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
         tkExtra.Balloon.set(self.overrideCombo, _("Select override type."))
         self.addWidget(self.overrideCombo)
 
-        b = Button(f, text=_("Reset"), pady=0, command=self.resetOverride)
+        b = Button(
+            f,
+            text=_("Reset"),
+            pady=6,
+            padx=8,
+            width=8,
+            height=2,
+            command=self.resetOverride,
+        )
         b.grid(row=row + 1, column=col, pady=0, sticky=NSEW)
         tkExtra.Balloon.set(b, _("Reset override to 100%"))
         self.addWidget(b)
@@ -2076,8 +2094,8 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             from_=25,
             to_=200,
             resolution=1,
-            width=28,
-            sliderlength=40,
+            width = 28,
+            sliderlength = 40,
         )
         self.overrideScale.bind("<Double-1>", self.resetOverride)
         self.overrideScale.bind("<Button-3>", self.resetOverride)
@@ -2109,8 +2127,10 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             compound=LEFT,
             indicatoron=False,
             variable=self.spindle,
-            padx=1,
-            pady=0,
+            padx=12,
+            pady=8,
+            width=10,
+            height=40,
         )
         tkExtra.Balloon.set(b, _("Start/Stop hot wire (M3/M5)"))
         b.grid(row=row, column=col, pady=0, sticky=NSEW)
@@ -2125,8 +2145,8 @@ class StateFrame(CNCRibbon.PageExLabelFrame):
             orient=HORIZONTAL,
             from_=0,
             to_=1200,
-            width=28,
-            sliderlength=40,
+            width = 28,
+            sliderlength = 40,
         )
         tkExtra.Balloon.set(b, _("Set Hot Wire PWM (0-100%)"))
         b.grid(row=row, column=col, sticky=EW, columnspan=3)

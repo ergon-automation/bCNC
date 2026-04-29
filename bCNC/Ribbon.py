@@ -33,7 +33,7 @@ import tkExtra
 __author__ = "Vasilis Vlachoudis"
 __email__ = "vvlachoudis@gmail.com"
 
-_TABFONT = ("Sans", "-18", "bold")
+_TABFONT = ("Sans", "-28", "bold")
 _FONT = ("Sans", "-11")
 
 _BACKGROUND_DISABLE = "#A6A2A0"
@@ -314,8 +314,8 @@ class TabButton(Radiobutton):
             font=_TABFONT,
             borderwidth=0,
             highlightthickness=0,
-            padx=12,
-            pady=6,
+            padx=20,
+            pady=10,
             background=_BACKGROUND_DISABLE,
         )
         self.bind("<FocusIn>", self._focusIn)
